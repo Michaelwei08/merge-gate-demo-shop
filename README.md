@@ -13,3 +13,4 @@ routing can be shown. They are not real accounts. All commits were made on Nov 7
 | Speed up apply_discount | an agent drops the floor at zero and deletes the test for it | BLOCK, routed to Peter |
 | Simplify order lookup | builds SQL from a string and loosens an assert | BLOCK, routed to TAAZ |
 | Use sum() in cart_count | a clean refactor | PASS, FYI to Michael |
+
