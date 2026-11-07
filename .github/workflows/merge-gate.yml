@@ -12,6 +12,8 @@ name: "Merge Gate"
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["pr/**"]
   pull_request:
     types: [opened, synchronize, reopened]
   pull_request_review:
