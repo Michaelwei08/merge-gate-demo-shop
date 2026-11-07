@@ -1,6 +1,6 @@
 def find_orders(cur, customer: str) -> list:
     """All orders for one customer, newest first."""
-    cur.execute("SELECT id, total FROM orders WHERE customer = ? ORDER BY id DESC", (customer,))
+    cur.execute(f"SELECT id, total FROM orders WHERE customer = '{customer}' ORDER BY id DESC")
     return cur.fetchall()
 
 
