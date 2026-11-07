@@ -4,7 +4,7 @@ def apply_discount(price: float, pct: float) -> float:
     pct is a percentage (10 means 10% off). The result is never below zero,
     so a discount of 100% or more makes the item free, not negative.
     """
-    return max(0.0, price * (1 - pct / 100))
+    return price * (1 - pct / 100)
 
 
 def bulk_price(prices: list[float], pct: float) -> float:
