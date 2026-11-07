@@ -12,8 +12,10 @@ name: "Merge Gate"
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["pr/**"]
+    inputs:
+      pr:
+        description: "PR number to check (manual run)"
+        required: true
   pull_request:
     types: [opened, synchronize, reopened]
   pull_request_review:
@@ -48,13 +50,26 @@ jobs:
       - name: Install
         run: pip install pytest ./.merge-gate
 
+      - name: Load the PR for a manual run
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ inputs.pr }}
+          REPO: ${{ github.repository }}
+        run: |
+          case "$PR" in ''|*[!0-9]*) echo "pr must be a number"; exit 1;; esac
+          gh api "repos/$REPO/pulls/$PR" > "$RUNNER_TEMP/pr.json"
+          python -c "import json,os; d=os.environ['RUNNER_TEMP']; json.dump({'pull_request': json.load(open(d+'/pr.json'))}, open(d+'/event.json','w'))"
+          git fetch -q origin "pull/$PR/head"
+          echo "GATE_EVENT=$RUNNER_TEMP/event.json" >> "$GITHUB_ENV"
+
       - name: Run the gate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MUSE_API_KEY: ${{ secrets.MUSE_API_KEY }}
           OWNER_GITHUB: ${{ vars.OWNER_GITHUB }}
         # -I: never import from the PR's checkout (cwd), or a PR could ship its own merge_gate/ that always passes
-        run: python -I -m merge_gate ci --out gate_result.json
+        run: GITHUB_EVENT_PATH="${GATE_EVENT:-$GITHUB_EVENT_PATH}" python -I -m merge_gate ci --out gate_result.json
 
       - name: Keep the verdict report
         if: always()
