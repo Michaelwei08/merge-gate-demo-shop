@@ -11,3 +11,7 @@ def test_discount_never_negative():
 
 def test_bulk():
     assert bulk_price([10, 20], 50) == 15.0
+
+
+def test_discount_rounding_close():
+    assert abs(apply_discount(19.99, 15) - 16.9915) < 1e-9
